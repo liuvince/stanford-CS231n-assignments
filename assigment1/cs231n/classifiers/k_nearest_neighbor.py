@@ -180,6 +180,7 @@ class KNearestNeighbor(object):
             # label.                                                                #
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+
             y_pred[i] = np.bincount(closest_y).argmax()
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
