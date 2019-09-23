@@ -45,7 +45,7 @@ class LinearClassifier(object):
             y_batch = None
 
             #########################################################################
-            # TODO:                                                                 #
+            # DONE:                                                                 #
             # Sample batch_size elements from the training data and their           #
             # corresponding labels to use in this round of gradient descent.        #
             # Store the data in X_batch and their corresponding labels in           #
@@ -57,7 +57,9 @@ class LinearClassifier(object):
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            pass
+            indices = np.random.choice(num_train, batch_size)
+            X_batch = X[indices, :]
+            y_batch = y[indices]
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -67,12 +69,12 @@ class LinearClassifier(object):
 
             # perform parameter update
             #########################################################################
-            # TODO:                                                                 #
+            # DONE:                                                                 #
             # Update the weights using the gradient and the learning rate.          #
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            pass
+            self.W -= grad * learning_rate
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -97,12 +99,13 @@ class LinearClassifier(object):
         """
         y_pred = np.zeros(X.shape[0])
         ###########################################################################
-        # TODO:                                                                   #
+        # DONE:                                                                   #
         # Implement this method. Store the predicted labels in y_pred.            #
         ###########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        y_pred_proba = X.dot(self.W)
+        y_pred = np.argmax(y_pred_proba, axis = 1)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return y_pred

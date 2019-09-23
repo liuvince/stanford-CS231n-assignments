@@ -26,15 +26,40 @@ def softmax_loss_naive(W, X, y, reg):
     dW = np.zeros_like(W)
 
     #############################################################################
-    # TODO: Compute the softmax loss and its gradient using explicit loops.     #
+    # DONE: Compute the softmax loss and its gradient using explicit loops.     #
     # Store the loss in loss and the gradient in dW. If you are not careful     #
     # here, it is easy to run into numeric instability. Don't forget the        #
     # regularization!                                                           #
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    num_train = X.shape[0]
+    num_classes = W.shape[1]
+    for i in range(num_train):
+        scores = X[i].dot(W)
+        exp_scores = np.exp(scores)
+        probs = exp_scores / np.sum(exp_scores)
 
+        # Compute the loss: average cross-entropy loss
+        loss += -np.log(probs[y[i]])
+
+        # Compute the gradient
+        # dli/dfk = pk - 1(yi=k)
+        dscores = probs
+        dscores[y[i]] -= 1
+        # backprop dW
+        for j in range(num_classes):
+            dW[:, j] += X[i] * dscores[j]
+        dW += reg * W
+    
+    # Divide the loss by num_train to obtain average
+    loss /= num_train
+    dW /= num_train
+
+    # Add regularization to the loss
+    loss += reg * np.sum(W * W)
+    dW += 2 * reg * W
+        
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
     return loss, dW
@@ -51,14 +76,33 @@ def softmax_loss_vectorized(W, X, y, reg):
     dW = np.zeros_like(W)
 
     #############################################################################
-    # TODO: Compute the softmax loss and its gradient using no explicit loops.  #
+    # DONE: Compute the softmax loss and its gradient using no explicit loops.  #
     # Store the loss in loss and the gradient in dW. If you are not careful     #
     # here, it is easy to run into numeric instability. Don't forget the        #
     # regularization!                                                           #
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    num_trains = X.shape[0]
+    
+    # Forward pass
+    scores = X.dot(W)
+    exp_scores = np.exp(scores)
+    probs = exp_scores / np.sum(exp_scores, axis = 1, keepdims = True)
+    correct_logprobs = -np.log(probs[range(num_trains), y])
+
+    # Compute the loss: data_loss + reg_loss
+    data_loss = np.sum(correct_logprobs) / num_trains
+    reg_loss = reg * np.sum(W * W)
+    loss = data_loss + reg_loss
+
+    # Back propagation
+    dscores = probs
+    dscores[range(num_trains), y] -= 1
+    dscores /= num_trains
+
+    dW = np.dot(X.T, dscores)
+    dW += reg * W
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
