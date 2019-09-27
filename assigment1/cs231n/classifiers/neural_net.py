@@ -99,7 +99,7 @@ class TwoLayerNet(object):
         # classifier loss.                                                          #
         #############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-        
+        scores -= np.max(scores, axis=1, keepdims=True) # Avoid unstability
         exp_scores = np.exp(scores)
         probs = exp_scores / np.sum(exp_scores, axis = 1, keepdims = True)
         correct_logprobs = -np.log(probs[range(N), y])
@@ -168,6 +168,10 @@ class TwoLayerNet(object):
         train_acc_history = []
         val_acc_history = []
 
+        #beta1 = 0.9
+        #beta2 = 0.999
+        #eps = 1e-8
+
         for it in range(num_iters):
             X_batch = None
             y_batch = None
@@ -195,9 +199,21 @@ class TwoLayerNet(object):
             # stored in the grads dictionary defined above.                         #
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+            #m = {}
+            #v = {}
 
-            for params in self.params:
-                self.params[params] -= learning_rate * grads[params]
+            #for param in self.params:
+            #    m[param] = np.zeros_like(grads[param])
+            #    v[param] = np.zeros_like(grads[param])
+            #i = it + 1
+            for param in self.params:
+            #   m[param] = beta1 * m[param] + (1-beta1)*grads[param]
+            #   mt = m[param] / (1-(beta1**i))
+            #   v[param] = beta2 * v[param] + (1-beta2)*(np.square(grads[param]))
+            #   vt = v[param] / (1-(beta2**i))
+            #   self.params[param] -= learning_rate * mt / (np.sqrt(vt) + eps)
+
+                self.params[param] -= learning_rate * grads[param]
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -244,6 +260,7 @@ class TwoLayerNet(object):
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
         hidden_layer = X.dot(self.params['W1']) + self.params['b1']
+        hidden_layer = np.maximum(0, hidden_layer)
         scores = hidden_layer.dot(self.params['W2']) + self.params['b2']
         y_pred = np.argmax(scores, axis = 1)
 
