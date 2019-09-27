@@ -39,7 +39,7 @@ class TwoLayerNet(object):
         self.reg = reg
 
         ############################################################################
-        # TODO: Initialize the weights and biases of the two-layer net. Weights    #
+        # DONE: Initialize the weights and biases of the two-layer net. Weights    #
         # should be initialized from a Gaussian centered at 0.0 with               #
         # standard deviation equal to weight_scale, and biases should be           #
         # initialized to zero. All weights and biases should be stored in the      #
@@ -49,7 +49,11 @@ class TwoLayerNet(object):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        self.params["W1"] = np.random.randn(input_dim, hidden_dim) * weight_scale
+        self.params["b1"] = np.zeros(hidden_dim)
+
+        self.params["W2"] = np.random.randn(hidden_dim, num_classes) * weight_scale
+        self.params["b2"] = np.zeros(num_classes)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -78,12 +82,18 @@ class TwoLayerNet(object):
         """
         scores = None
         ############################################################################
-        # TODO: Implement the forward pass for the two-layer net, computing the    #
+        # DONE: Implement the forward pass for the two-layer net, computing the    #
         # class scores for X and storing them in the scores variable.              #
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        W1, b1, W2, b2 = self.params["W1"], self.params["b1"], self.params["W2"], self.params["b2"]
+        
+        z1, affine1_cache = affine_forward(X, W1, b1)
+        a1, relu1_cache = relu_forward(z1)
+        z2, affine2_cache = affine_forward(a1, W2, b2)
+        scores, relu2_cache = relu_forward(z2)
+
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -96,18 +106,31 @@ class TwoLayerNet(object):
 
         loss, grads = 0, {}
         ############################################################################
-        # TODO: Implement the backward pass for the two-layer net. Store the loss  #
+        # DONE: Implement the backward pass for the two-layer net. Store the loss  #
         # in the loss variable and gradients in the grads dictionary. Compute data #
         # loss using softmax, and make sure that grads[k] holds the gradients for  #
         # self.params[k]. Don't forget to add L2 regularization!                   #
         #                                                                          #
-        # NOTE: To ensure that your implementation matches ours and you pass the   #
+        # DONE: To ensure that your implementation matches ours and you pass the   #
         # automated tests, make sure that your L2 regularization includes a factor #
         # of 0.5 to simplify the expression for the gradient.                      #
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        data_loss, grad_loss = softmax_loss(scores, y)
+        reg_loss = 0.5 * self.reg * ( (W1 * W1).sum() + (W2 * W2).sum() )
+        loss = data_loss + reg_loss
+
+        da2 = relu_backward(grad_loss, relu2_cache)
+        dz2, dw2, db2 = affine_backward(da2, affine2_cache)
+        dw2 += self.reg * W2
+        da1 = relu_backward(dz2, relu1_cache)
+        dx, dw1, db1 = affine_backward(da1, affine1_cache)
+        dw1 += self.reg * W1
+
+        grads = {'W2': dw2, 'b2': db2,
+                'W1': dw1, 'b1':db1} 
+
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
